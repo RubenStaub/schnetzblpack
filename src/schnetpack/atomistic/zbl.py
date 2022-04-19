@@ -1,16 +1,18 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import schnetpack as spk
-from schnetpack.nn.activations import softplus_inverse
+import schnetzblpack as szpk
+from schnetzblpack.nn.activations import softplus_inverse
+from schnetzblpack import Properties
 import numpy as np
 import os
 
 __all__ = ["ZBLRepulsionEnergy"]
 
 class ZBLRepulsionEnergy(nn.Module):
-    def __init__(self, a0=0.5291772105638411, ke=14.399645351950548):
+    def __init__(self, a0=0.5291772105638411, ke=14.399645351950548, distance_provider=szpk.nn.AtomDistances()):
         super().__init__()
+        self.distance_provider = distance_provider
         self.a0 = a0
         self.ke = ke
         self.kehalf = ke / 2
@@ -38,21 +40,27 @@ class ZBLRepulsionEnergy(nn.Module):
         nn.init.constant_(self._a3, softplus_inverse(0.40280))
         nn.init.constant_(self._a4, softplus_inverse(0.20160))
 
-    def forward(self, inputs, atomwise_predictions):
-        neighbors = inputs["_neighbors"]
-        neighbor_mask = inputs["_neighbor_mask"]
+    def forward(self, inputs, distances=None):
+        neighbors = inputs[Properties.neighbors]
+        neighbor_mask = inputs[Properties.neighbor_mask]
         n_batch, n_atoms, n_neigh = neighbors.shape
-        idx_i = torch.tensor([[i for i in range(n_atoms)] for i in range(n_batch)])
-        idx_i = idx_i.unsqueeze(-1).expand(n_batch, n_atoms, n_neigh)
         Zf = inputs["_atomic_numbers"].float().unsqueeze(-1)
-        r_ij = inputs["distances"]
+        if distances is None:
+            distances = self.distance_provider(
+                inputs[Properties.R],
+                neighbors,
+                inputs[Properties.cell],
+                inputs[Properties.cell_offset],
+                neighbor_mask=neighbor_mask,
+            )
+        r_ij = distances
         z_ex = Zf.expand(n_batch, n_atoms, n_atoms)
 
         # calculate parameters
         z = z_ex ** F.softplus(self._apow)
         a = (z + z.transpose(1, 2)) * F.softplus(self._adiv)
         # remove diag
-        a = torch.gather(a, -1, neighbors) * neighbor_mas
+        a = torch.gather(a, -1, neighbors) * neighbor_mask
 
         a1 = F.softplus(self._a1) * a
         a2 = F.softplus(self._a2) * a
@@ -83,4 +91,4 @@ class ZBLRepulsionEnergy(nn.Module):
         corr_ij = torch.where(
             neighbor_mask != 0, self.kehalf * f * zizj / r_ij, torch.zeros_like(r_ij)
         )
-        return torch.sum(corr_ij, (-1, -2), keepdim=True).squeeze(-1)
+        return torch.sum(corr_ij, -1, keepdim=True)
