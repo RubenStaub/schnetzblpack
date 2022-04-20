@@ -40,20 +40,21 @@ class ZBLRepulsionEnergy(nn.Module):
         nn.init.constant_(self._a3, softplus_inverse(0.40280))
         nn.init.constant_(self._a4, softplus_inverse(0.20160))
 
-    def forward(self, inputs, distances=None):
+    def forward(self, inputs):
         neighbors = inputs[Properties.neighbors]
         neighbor_mask = inputs[Properties.neighbor_mask]
         n_batch, n_atoms, n_neigh = neighbors.shape
         Zf = inputs["_atomic_numbers"].float().unsqueeze(-1)
-        if distances is None:
-            distances = self.distance_provider(
+        if Properties.distances in inputs.keys():
+            r_ij = inputs[Properties.distances]
+        else:
+            r_ij = self.distance_provider(
                 inputs[Properties.R],
                 neighbors,
                 inputs[Properties.cell],
                 inputs[Properties.cell_offset],
                 neighbor_mask=neighbor_mask,
             )
-        r_ij = distances
         z_ex = Zf.expand(n_batch, n_atoms, n_atoms)
 
         # calculate parameters
