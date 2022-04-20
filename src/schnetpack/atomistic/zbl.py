@@ -1,16 +1,16 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import schnetzblpack as szpk
-from schnetzblpack.nn.activations import softplus_inverse
-from schnetzblpack import Properties
+import schnetpack as spk
+from schnetpack.nn.activations import softplus_inverse
+from schnetpack import Properties
 import numpy as np
 import os
 
 __all__ = ["ZBLRepulsionEnergy"]
 
 class ZBLRepulsionEnergy(nn.Module):
-    def __init__(self, a0=0.5291772105638411, ke=14.399645351950548, distance_provider=szpk.nn.AtomDistances()):
+    def __init__(self, a0=0.5291772105638411, ke=14.399645351950548, distance_provider=spk.nn.AtomDistances()):
         super().__init__()
         self.distance_provider = distance_provider
         self.a0 = a0
