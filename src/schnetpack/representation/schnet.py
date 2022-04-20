@@ -135,6 +135,7 @@ class SchNet(nn.Module):
         trainable_gaussians=False,
         distance_expansion=None,
         charged_systems=False,
+        zbl_correction=False,
     ):
         super(SchNet, self).__init__()
 
@@ -192,6 +193,7 @@ class SchNet(nn.Module):
         if charged_systems:
             self.charge = nn.Parameter(torch.Tensor(1, n_atom_basis))
             self.charge.data.normal_(0, 1.0 / n_atom_basis ** 0.5)
+        self.zbl_correction = zbl_correction
 
     def forward(self, inputs):
         """Compute atomic representations/embeddings.
@@ -227,6 +229,8 @@ class SchNet(nn.Module):
         r_ij = self.distances(
             positions, neighbors, cell, cell_offset, neighbor_mask=neighbor_mask
         )
+        if self.zbl_correction:
+            inputs[Properties.distances] = r_ij
         # expand interatomic distances (for example, Gaussian smearing)
         f_ij = self.distance_expansion(r_ij)
         # store intermediate representations
