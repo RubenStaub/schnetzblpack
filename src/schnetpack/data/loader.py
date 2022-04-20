@@ -8,6 +8,7 @@ logger = logging.getLogger(__name__)
 
 from schnetpack import Properties
 from .stats import StatisticsAccumulator
+from schnetpack.atomistic import ZBLRepulsionEnergy
 
 __all__ = ["AtomsLoader"]
 
@@ -162,7 +163,7 @@ class AtomsLoader(DataLoader):
         )
 
     def get_statistics(
-        self, property_names, divide_by_atoms=False, single_atom_ref=None
+        self, property_names, divide_by_atoms=False, single_atom_ref=None, zbl_correction=False
     ):
         """
         Compute mean and variance of a property. Uses the incremental Welford
@@ -175,6 +176,8 @@ class AtomsLoader(DataLoader):
                 (default: False)
             single_atom_ref (dict or bool): reference values for single atoms (default:
                 None)
+            zbl_correction (dict or bool): substract ZBL repulsion energy if True
+                (default: False)
 
         Returns:
             mean: Mean value
@@ -187,6 +190,8 @@ class AtomsLoader(DataLoader):
             divide_by_atoms = {prop: divide_by_atoms for prop in property_names}
         if single_atom_ref is None:
             single_atom_ref = {prop: None for prop in property_names}
+        if type(zbl_correction) is not dict:
+            zbl_correction = {prop: zbl_correction for prop in property_names}
 
         with torch.no_grad():
             statistics = {
@@ -199,6 +204,7 @@ class AtomsLoader(DataLoader):
                     self._update_statistic(
                         divide_by_atoms[prop],
                         single_atom_ref[prop],
+                        zbl_correction[prop],
                         prop,
                         row,
                         statistics[prop],
@@ -210,12 +216,15 @@ class AtomsLoader(DataLoader):
         return means, stddevs
 
     def _update_statistic(
-        self, divide_by_atoms, single_atom_ref, property_name, row, statistics
+        self, divide_by_atoms, single_atom_ref, zbl_correction, property_name, row, statistics
     ):
         """
         Helper function to update iterative mean / stddev statistics
         """
         property_value = row[property_name]
+        if zbl_correction:
+            zbl_repulsion = torch.sum(ZBLEnergyRepulsion(row), dim=1)
+            property_value -= zbl_repulsion
         if single_atom_ref is not None:
             z = row["_atomic_numbers"]
             p0 = torch.sum(torch.from_numpy(single_atom_ref[z]).float(), dim=1)
