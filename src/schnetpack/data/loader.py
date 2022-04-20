@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 from schnetpack import Properties
 from .stats import StatisticsAccumulator
-from schnetpack.atomistic import ZBLRepulsionEnergy
+from schnetpack.atomistic.zbl import ZBLRepulsionEnergy
 
 __all__ = ["AtomsLoader"]
 
