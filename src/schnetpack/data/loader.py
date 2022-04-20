@@ -223,7 +223,7 @@ class AtomsLoader(DataLoader):
         """
         property_value = row[property_name]
         if zbl_correction:
-            zbl_repulsion = torch.sum(ZBLEnergyRepulsion(row), dim=1)
+            zbl_repulsion = torch.sum(ZBLRepulsionEnergy(row), dim=1)
             property_value -= zbl_repulsion
         if single_atom_ref is not None:
             z = row["_atomic_numbers"]
