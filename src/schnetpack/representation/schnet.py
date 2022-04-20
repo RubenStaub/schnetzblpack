@@ -135,7 +135,7 @@ class SchNet(nn.Module):
         trainable_gaussians=False,
         distance_expansion=None,
         charged_systems=False,
-        zbl_correction=False,
+        keep_distances=False,
     ):
         super(SchNet, self).__init__()
 
@@ -193,7 +193,7 @@ class SchNet(nn.Module):
         if charged_systems:
             self.charge = nn.Parameter(torch.Tensor(1, n_atom_basis))
             self.charge.data.normal_(0, 1.0 / n_atom_basis ** 0.5)
-        self.zbl_correction = zbl_correction
+        self.keep_distances = keep_distances
 
     def forward(self, inputs):
         """Compute atomic representations/embeddings.
@@ -229,7 +229,7 @@ class SchNet(nn.Module):
         r_ij = self.distances(
             positions, neighbors, cell, cell_offset, neighbor_mask=neighbor_mask
         )
-        if self.zbl_correction:
+        if self.keep_distances:
             inputs[Properties.distances] = r_ij
         # expand interatomic distances (for example, Gaussian smearing)
         f_ij = self.distance_expansion(r_ij)
@@ -246,3 +246,43 @@ class SchNet(nn.Module):
         if self.return_intermediate:
             return x, xs
         return x
+
+
+class SchNetZBL(SchNet):
+    """SchNet architecture for learning representations of atomistic systems, optimised for ZBL correction
+    
+    (for more details see SchNet module documentation)
+    """
+
+    def __init__(
+        self,
+        n_atom_basis=128,
+        n_filters=128,
+        n_interactions=3,
+        cutoff=5.0,
+        n_gaussians=25,
+        normalize_filter=False,
+        coupled_interactions=False,
+        return_intermediate=False,
+        max_z=100,
+        cutoff_network=CosineCutoff,
+        trainable_gaussians=False,
+        distance_expansion=None,
+        charged_systems=False,
+    ):
+        super().__init__(
+            n_atom_basis=n_atom_basis,
+            n_filters=n_filters,
+            n_interactions=n_interactions,
+            cutoff=cutoff,
+            n_gaussians=n_gaussians,
+            normalize_filter=normalize_filter,
+            coupled_interactions=coupled_interactions,
+            return_intermediate=return_intermediate,
+            max_z=max_z,
+            cutoff_network=cutoff_network,
+            trainable_gaussians=trainable_gaussians,
+            distance_expansion=distance_expansion,
+            charged_systems=charged_systems,
+            keep_distances=True,
+        )
