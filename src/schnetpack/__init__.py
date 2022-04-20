@@ -14,6 +14,7 @@ class Properties:
     neighbors = "_neighbors"
     neighbor_mask = "_neighbor_mask"
     cell_offset = "_cell_offset"
+    distances = "_distances"
     neighbor_pairs_j = "_neighbor_pairs_j"
     neighbor_pairs_k = "_neighbor_pairs_k"
     neighbor_pairs_mask = "_neighbor_pairs_mask"
