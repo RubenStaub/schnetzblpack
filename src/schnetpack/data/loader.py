@@ -192,6 +192,11 @@ class AtomsLoader(DataLoader):
             single_atom_ref = {prop: None for prop in property_names}
         if type(zbl_correction) is not dict:
             zbl_correction = {prop: zbl_correction for prop in property_names}
+        if any(zbl_correction.values()):
+            zbl_module = ZBLRepulsionEnergy()
+            for prop, zbl_corr in zbl_correction.items():
+                if zbl_corr:
+                    zbl_correction[prop] = zbl_module
 
         with torch.no_grad():
             statistics = {
@@ -223,7 +228,7 @@ class AtomsLoader(DataLoader):
         """
         property_value = row[property_name]
         if zbl_correction:
-            zbl_repulsion = torch.sum(ZBLRepulsionEnergy(row), dim=1)
+            zbl_repulsion = torch.sum(zbl_correction(row), dim=1)
             property_value -= zbl_repulsion
         if single_atom_ref is not None:
             z = row["_atomic_numbers"]
