@@ -9,6 +9,7 @@ from .zbl import ZBLRepulsionEnergy
 
 __all__ = [
     "Atomwise",
+    "AtomwiseZBL",
     "ElementalAtomwise",
     "DipoleMoment",
     "ElementalDipoleMoment",
