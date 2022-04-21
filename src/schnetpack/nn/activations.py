@@ -1,4 +1,5 @@
 import numpy as np
+import torch
 from torch.nn import functional
 
 __all__ = ["shifted_softplus", "softplus_inverse"]
