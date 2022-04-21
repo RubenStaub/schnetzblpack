@@ -196,6 +196,45 @@ class AtomwiseZBL(Atomwise):
 
     See Atomwise module documentation for more details.
     """
+    
+    def __init__(
+        self,
+        n_in,
+        n_out=1,
+        aggregation_mode="sum",
+        n_layers=2,
+        n_neurons=None,
+        activation=schnetpack.nn.activations.shifted_softplus,
+        property="y",
+        contributions=None,
+        derivative=None,
+        negative_dr=False,
+        stress=None,
+        create_graph=False,
+        mean=None,
+        stddev=None,
+        atomref=None,
+        outnet=None,
+    ):
+        super().__init__(
+            n_in=n_in,
+            n_out=n_out,
+            aggregation_mode=aggregation_mode,
+            n_layers=n_layers,
+            n_neurons=n_neurons,
+            activation=activation,
+            property=property,
+            contributions=contributions,
+            derivative=derivative,
+            negative_dr=negative_dr,
+            stress=stress,
+            create_graph=create_graph,
+            mean=mean,
+            stddev=stddev,
+            atomref=atomref,
+            outnet=outnet,
+        )
+        self.zbl_correction = ZBLRepulsionEnergy()
 
     def forward(self, inputs):
         r"""
@@ -213,7 +252,7 @@ class AtomwiseZBL(Atomwise):
             yi = yi + y0
         
         # add ZBL energy repulsion
-        zbl_corr = ZBLRepulsionEnergy(inputs)
+        zbl_corr = self.zbl_correction(inputs)
         yi += zbl_corr
 
         y = self.atom_pool(yi, atom_mask)
