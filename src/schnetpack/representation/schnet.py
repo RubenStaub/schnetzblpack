@@ -10,7 +10,7 @@ from schnetpack.nn.neighbors import AtomDistances
 from schnetpack.nn.activations import shifted_softplus
 
 
-__all__ = ["SchNetInteraction", "SchNet"]
+__all__ = ["SchNetInteraction", "SchNet", "SchNetZBL"]
 
 
 class SchNetInteraction(nn.Module):
