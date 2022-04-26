@@ -215,7 +215,7 @@ class AtomwiseZBL(Atomwise):
         stddev=None,
         atomref=None,
         outnet=None,
-        update_zbl=False,
+        update_zbl=True,
     ):
         super().__init__(
             n_in=n_in,
