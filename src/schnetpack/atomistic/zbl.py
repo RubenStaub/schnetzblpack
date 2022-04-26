@@ -10,22 +10,22 @@ import os
 __all__ = ["ZBLRepulsionEnergy"]
 
 class ZBLRepulsionEnergy(nn.Module):
-    def __init__(self, a0=0.5291772105638411, ke=14.399645351950548, distance_provider=spk.nn.AtomDistances()):
+    def __init__(self, a0=0.5291772105638411, ke=14.399645351950548, distance_provider=spk.nn.AtomDistances(), requires_grad=False):
         super().__init__()
         self.distance_provider = distance_provider
         self.a0 = a0
         self.ke = ke
         self.kehalf = ke / 2
-        self.register_parameter("_adiv", nn.Parameter(torch.Tensor(1)))
-        self.register_parameter("_apow", nn.Parameter(torch.Tensor(1)))
-        self.register_parameter("_c1", nn.Parameter(torch.Tensor(1)))
-        self.register_parameter("_c2", nn.Parameter(torch.Tensor(1)))
-        self.register_parameter("_c3", nn.Parameter(torch.Tensor(1)))
-        self.register_parameter("_c4", nn.Parameter(torch.Tensor(1)))
-        self.register_parameter("_a1", nn.Parameter(torch.Tensor(1)))
-        self.register_parameter("_a2", nn.Parameter(torch.Tensor(1)))
-        self.register_parameter("_a3", nn.Parameter(torch.Tensor(1)))
-        self.register_parameter("_a4", nn.Parameter(torch.Tensor(1)))
+        self.register_parameter("_adiv", nn.Parameter(torch.Tensor(1), requires_grad=requires_grad))
+        self.register_parameter("_apow", nn.Parameter(torch.Tensor(1), requires_grad=requires_grad))
+        self.register_parameter("_c1", nn.Parameter(torch.Tensor(1), requires_grad=requires_grad))
+        self.register_parameter("_c2", nn.Parameter(torch.Tensor(1), requires_grad=requires_grad))
+        self.register_parameter("_c3", nn.Parameter(torch.Tensor(1), requires_grad=requires_grad))
+        self.register_parameter("_c4", nn.Parameter(torch.Tensor(1), requires_grad=requires_grad))
+        self.register_parameter("_a1", nn.Parameter(torch.Tensor(1), requires_grad=requires_grad))
+        self.register_parameter("_a2", nn.Parameter(torch.Tensor(1), requires_grad=requires_grad))
+        self.register_parameter("_a3", nn.Parameter(torch.Tensor(1), requires_grad=requires_grad))
+        self.register_parameter("_a4", nn.Parameter(torch.Tensor(1), requires_grad=requires_grad))
         self.reset_parameters()
 
     def reset_parameters(self):
