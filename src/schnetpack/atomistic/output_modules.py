@@ -215,6 +215,7 @@ class AtomwiseZBL(Atomwise):
         stddev=None,
         atomref=None,
         outnet=None,
+        update_zbl=False,
     ):
         super().__init__(
             n_in=n_in,
@@ -234,7 +235,7 @@ class AtomwiseZBL(Atomwise):
             atomref=atomref,
             outnet=outnet,
         )
-        self.zbl_correction = ZBLRepulsionEnergy()
+        self.zbl_correction = ZBLRepulsionEnergy(requires_grad=update_zbl)
 
     def forward(self, inputs):
         r"""
