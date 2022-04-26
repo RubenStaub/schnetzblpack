@@ -5,7 +5,7 @@ from torch.autograd import grad
 
 import schnetpack
 from schnetpack import nn as L, Properties
-from .zbl import ZBLRepulsionEnergy
+from .corrections import ZBLRepulsionEnergy
 
 __all__ = [
     "Atomwise",
@@ -196,7 +196,7 @@ class AtomwiseZBL(Atomwise):
 
     See Atomwise module documentation for more details.
     """
-    
+
     def __init__(
         self,
         n_in,
@@ -250,7 +250,7 @@ class AtomwiseZBL(Atomwise):
         if self.atomref is not None:
             y0 = self.atomref(atomic_numbers)
             yi = yi + y0
-        
+
         # add ZBL energy repulsion
         zbl_corr = self.zbl_correction(inputs)
         yi += zbl_corr
