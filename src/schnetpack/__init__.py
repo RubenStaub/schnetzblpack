@@ -4,7 +4,7 @@ except ImportError:
     # Running on pre-3.8 Python; use importlib-metadata package
     import importlib_metadata as metadata
 
-__version__ = metadata.version("schnetpack")
+__version__ = "Ruben.mode"#metadata.version("schnetpack")
 
 
 class Properties:
