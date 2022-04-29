@@ -10,7 +10,7 @@ from shutil import rmtree
 
 # load qm9 dataset and download if necessary
 print("loading data...")
-data = QM9("data/schnetpack/qm9.db")
+data = QM9("qm9.db")
 
 # split in train and val
 print("creating splits...")
