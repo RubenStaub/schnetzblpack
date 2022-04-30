@@ -89,6 +89,7 @@ class QM9(DownloadableAtomsData):
             QM9.H,
             QM9.G,
             QM9.Cv,
+            'charges',
         ]
 
         units = [
@@ -106,6 +107,7 @@ class QM9(DownloadableAtomsData):
             Hartree,
             Hartree,
             Hartree,
+            1.0,
             1.0,
         ]
 

@@ -4,13 +4,14 @@ import torch.nn.functional as F
 from torch.optim import Adam
 
 import schnetpack.representation as rep
-from schnetpack.datasets import *
+from schnetpack.datasets import QM9
 import schnetpack as spk
 from shutil import rmtree
+import os
 
 # load qm9 dataset and download if necessary
 print("loading data...")
-data = QM9("qm9.db")
+data = QM9("qm9.db", load_only=[QM9.U0, 'charges'])
 
 # split in train and val
 print("creating splits...")
