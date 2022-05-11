@@ -229,7 +229,7 @@ class SchNet(nn.Module):
         r_ij = self.distances(
             positions, neighbors, cell, cell_offset, neighbor_mask=neighbor_mask
         )
-        if self.keep_distances:
+        if hasattr(self, 'keep_distances') and self.keep_distances:
             inputs[Properties.distances] = r_ij
         # expand interatomic distances (for example, Gaussian smearing)
         f_ij = self.distance_expansion(r_ij)
@@ -250,7 +250,7 @@ class SchNet(nn.Module):
 
 class SchNetZBL(SchNet):
     """SchNet architecture for learning representations of atomistic systems, optimised for ZBL correction
-    
+
     (for more details see SchNet module documentation)
     """
 
